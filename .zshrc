@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.
-  export ZSH=/home/jacob/.oh-my-zsh
+export ZSH=/home/jacob/.oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -81,19 +81,31 @@ fi
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
 # Bullet Train theme options
-alias slock="gnome-screensaver-command -l"
-alias tmux="tmux -2"
 BULLETTRAIN_PROMPT_CHAR=\➠
 BULLETTRAIN_CONTEXT_SHOW=true
-PANEL_FIFO="/tmp/panel-fifo"
-alias ssh="TERM=xterm ssh"
 
-function git-branchdate() {
-  git for-each-ref --sort=committerdate refs/remotes/\
-    --format='%(HEAD)%(color:green)%(committerdate:relative)%(color:reset);%(color:yellow)%(refname:short)%(color:reset);%(authorname);'\
-    | column -t -s ';'
+# Pyenv settings
+export PATH="$HOME/.pyenv/bin:$PATH"
+BULLETTRAIN_PROMPT_ORDER=(
+  context
+  dir
+  ruby
+  git
+  virtualenv
+)
+
+# Virtualenv: current working virtualenv
+prompt_virtualenv() {
+  local virtualenv_path="$VIRTUAL_ENV"
+  if [[ -n $virtualenv_path && -n $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
+    prompt_segment $BULLETTRAIN_VIRTUALENV_BG $BULLETTRAIN_VIRTUALENV_FG $BULLETTRAIN_VIRTUALENV_PREFIX" $(basename $virtualenv_path)"
+  elif which pyenv &> /dev/null; then
+    if [[ "$(pyenv version | sed -e 's/ (set.*$//' | tr '\n' ' ' | sed 's/.$//')" -eq "system" ]]; then
+      prompt_segment
+    else
+      prompt_segment $BULLETTRAIN_VIRTUALENV_BG $BULLETTRAIN_VIRTUALENV_FG $BULLETTRAIN_VIRTUALENV_PREFIX" $(pyenv version | sed -e 's/ (set.*$//' | tr '\n' ' ' | sed 's/.$//')"
+    fi
+  fi
 }
-
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
